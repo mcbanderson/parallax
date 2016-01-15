@@ -7,7 +7,6 @@ to create the effect, and so only works on elements that have a background-image
 ##Installation
 To use the plugin, simply include it in your project.
 
-Example:
 ```
 <script src="/js/parallax.js"></script>
 ```
