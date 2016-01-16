@@ -1,7 +1,11 @@
 /**
  *
  * Parallax.js jQuery Plugin
+ *
+ * Github: https://github.com/mcbanderson/parallax/
+ *
  * @author: Max Anderson
+ * @license: GNU General Public License
  *
  */
 
@@ -43,7 +47,7 @@
         },
 
         parallax: function(that, xPos, yPos, xUnit, yUnit) {
-            that.css({'background-position': xPos + xUnit + yPos + yUnit});
+            $(that).css({'background-position': xPos + xUnit + yPos + yUnit});
             return this;
         }
 
@@ -67,7 +71,7 @@
         xSpeed      : 0,
         xStart      : 0,
         xUnit       : '% ',
-        ySpeed      : 0.2,
+        ySpeed      : 1,
         yStart      : 0,
         yUnit       : 'px',
     };
