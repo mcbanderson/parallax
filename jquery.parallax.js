@@ -9,57 +9,63 @@
  *
  */
 
-;(function($){
+;(function($, window, document, undefined){
 
-    var methods = {
-        init: function(options) {
-            return this.each(function() {
-                this.opts = $.extend(true, {}, $.fn.parallax.defaults, options, $(this).data());
+    var Parallax = function(elem, options){
+        this.elem = elem;
+        this.$elem = $(elem);
+        this.options = options;
+        this.metadata = this.$elem.data('parallax');
+    };
 
-                var that = this;
-
-                $(window).on("scroll load", function() {
-                    var xPos = methods.position.call(that, that.opts.xStart, that.opts.xSpeed, that.opts.exponent);
-                    var yPos = methods.position.call(that, that.opts.yStart, that.opts.ySpeed, that.opts.exponent);
-
-                    methods.parallax.call(this, that, xPos, yPos, that.opts.xUnit, that.opts.yUnit);
-                });
-
-                return this;
-            });
+    Parallax.prototype = {
+        defaults: {
+            exponent    : 1.25,
+            motion      : 'linear',
+            xSpeed      : 0,
+            xStart      : 0,
+            xUnit       : '% ',
+            ySpeed      : 0.2,
+            yStart      : 0,
+            yUnit       : 'px',
         },
-
-        position: function(start, speed, exponent) {
+        xPos: 0,
+        yPos: 0,
+        init: function() {
+            this.config = $.extend({}, this.defaults, this.options, this.metadata);
+            $(window).scroll(this.parallax.bind(this));
+            return this;
+        },
+        exponential: function(start, speed, exponent) {
             return start + Math.pow($(window).scrollTop(), exponent) * speed;
         },
+        linear: function(start, speed) {
+            return start + $(window).scrollTop() * speed;
+        },
+        parallax: function() {
+            if (this.config.motion === 'linear') {
+                this.xPos = this.linear(this.config.xStart, this.config.xSpeed);
+                this.yPos = this.linear(this.config.yStart, this.config.ySpeed);
+            }
 
-        parallax: function(that, xPos, yPos, xUnit, yUnit) {
-            $(that).css({'background-position': xPos + xUnit + yPos + yUnit});
-            return this;
+            if (this.config.motion === 'exponential') {
+                this.xPos = this.exponential(this.config.xStart, this.config.xSpeed, this.config.exponent);
+                this.yPos = this.exponential(this.config.yStart, this.config.ySpeed, this.config.exponent);
+            }
+
+            this.render();
+        },
+        render: function() {
+            this.$elem.css({'background-position': this.xPos + this.config.xUnit + this.yPos + this.config.yUnit});
         }
-
     };
 
-    $.fn.parallax = function(method) {
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        }
-        else if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, arguments);
-        }
-        else {
-            $.error('Method ' + method + ' does not exist!');
-        }
+    Parallax.defaults = Parallax.prototype.defaults;
+
+    $.fn.parallax = function(options) {
+        return this.each(function() {
+            new Parallax(this, options).init();
+        });
     };
 
-    $.fn.parallax.defaults = {
-        exponent    : 1,
-        xSpeed      : 0,
-        xStart      : 0,
-        xUnit       : 'px ',
-        ySpeed      : 1,
-        yStart      : 0,
-        yUnit       : 'px',
-    };
-
-})(jQuery);
+})(jQuery, window, document);
